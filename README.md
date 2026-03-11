@@ -8,6 +8,10 @@ A proof-of-concept demonstrating [ZeroDev's Smart Routing Address (SRA)](https:/
 - ZeroDev automatically detects deposits and bridges to the destination chain
 - Supports both USDC (ERC-20) and native ETH
 
+## How It Works
+
+A Smart Routing Address encodes a cross-chain intent as a deterministic smart contract address. When funds arrive at that address on any source chain, ZeroDev's off-chain router detects the deposit, triggers a bridge to the destination chain, and executes the configured on-chain action (in this POC: just receive the tokens — no further action). The user never touches a bridge UI.
+
 ## Chain Configuration
 
 | Role | Chain | Chain ID |
@@ -41,7 +45,8 @@ cp .env.example .env
 ### Step 1 — Create a Smart Routing Address
 
 ```bash
-npx tsx src/create-address.ts
+npm run create-address
+# or: npx tsx src/create-address.ts
 ```
 
 This will output:
@@ -61,7 +66,8 @@ Get testnet funds:
 ### Step 3 — Check Status
 
 ```bash
-npx tsx src/check-status.ts 0xYourSmartRoutingAddress
+npm run check-status -- 0xYourSmartRoutingAddress
+# or: npx tsx src/check-status.ts 0xYourSmartRoutingAddress
 ```
 
 This polls ZeroDev's API and shows:
@@ -74,6 +80,39 @@ This polls ZeroDev's API and shows:
 Check your destination wallet on Base Sepolia:
 - https://sepolia.basescan.org
 
+## Sample Output
+
+```
+=== ZeroDev Smart Routing Address POC ===
+
+Destination chain : Base Sepolia (chain ID 84532)
+Owner address     : 0xYourWallet...
+Source chains     : Arbitrum Sepolia, Sepolia
+
+Creating Smart Routing Address...
+
+✅ Smart Routing Address created!
+
+  Address : 0xAbCd...1234
+
+Fee estimates by source chain:
+
+  Arbitrum Sepolia (chain ID 421614):
+    USDC           fee:     0.000020  minDeposit: 1.000000
+    ETH            fee:     0.000010  minDeposit: 0.001000
+
+  Sepolia (chain ID 11155111):
+    USDC           fee:     0.000020  minDeposit: 1.000000
+    ETH            fee:     0.000010  minDeposit: 0.001000
+
+---
+Next steps:
+  1. Send USDC or ETH to 0xAbCd...1234
+     from any of: Arbitrum Sepolia, Sepolia
+  2. ZeroDev will automatically bridge the funds to Base Sepolia
+  3. Track status: npx tsx src/check-status.ts 0xAbCd...1234
+```
+
 ## Fees
 
 ZeroDev charges:
@@ -81,6 +120,15 @@ ZeroDev charges:
 - **0.10%** for transfers over $1,000
 
 Developers can sponsor fees via the [ZeroDev Dashboard](https://dashboard.zerodev.app) so users receive the full deposit amount.
+
+## Troubleshooting
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `OWNER_ADDRESS env var is required` | `.env` not created or address missing | Run `cp .env.example .env` and set `OWNER_ADDRESS=0x...` |
+| `Unsupported chain` | Chain not in ZeroDev SDK registry | Only use chains listed in the Chain Configuration table above |
+| `Native is not supported on chain X` | Chain doesn't support native token deposits | Remove `NATIVE` srcToken entry for that chain |
+| `Fetch failed / TLS error` | Network/proxy issue in local environment | Try on a different network; for local testing only: `NODE_TLS_REJECT_UNAUTHORIZED=0 npx tsx src/create-address.ts` |
 
 ## Resources
 
