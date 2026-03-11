@@ -1,0 +1,19 @@
+{
+  "name": "smart-routing-poc",
+  "version": "1.0.0",
+  "description": "ZeroDev Smart Routing Address POC — multi-chain deposits auto-routed to Base Sepolia",
+  "scripts": {
+    "create-address": "tsx src/create-address.ts",
+    "check-status": "tsx src/check-status.ts"
+  },
+  "dependencies": {
+    "@zerodev/smart-routing-address": "^0.2.1",
+    "dotenv": "^16.4.5",
+    "viem": "^2.41.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.4.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.0.0"
+  }
+}
